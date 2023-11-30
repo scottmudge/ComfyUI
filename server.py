@@ -620,7 +620,7 @@ class PromptServer():
             address = '0.0.0.0'
         if verbose:
             print("Starting server\n")
-            print("To see the GUI go to: http://{}:{}".format(address, port))
+            # print("To see the GUI go to: http://{}:{}".format(address, port))
         if call_on_start is not None:
             call_on_start(address, port)
 

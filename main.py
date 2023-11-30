@@ -105,7 +105,7 @@ def prompt_worker(q, server):
             gc.collect()
             comfy.model_management.soft_empty_cache()
             last_gc_collect = current_time
-            print("gc collect")
+            # print("gc collect")
 
 async def run(server, address='', port=8188, verbose=True, call_on_start=None):
     await asyncio.gather(server.start(address, port, verbose, call_on_start), server.publish_loop())
