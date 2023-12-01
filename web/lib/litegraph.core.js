@@ -5287,7 +5287,7 @@ LGraphNode.prototype.executeAction = function(action)
         this.render_title_colored = true;
 		this.render_link_tooltip = true;
 
-        this.links_render_mode = LiteGraph.SPLINE_LINK;
+        this.links_render_mode = LiteGraph.STRAIGHT_LINK;
 
         this.mouse = [0, 0]; //mouse in canvas coordinates, where 0,0 is the top-left corner of the blue rectangle
         this.graph_mouse = [0, 0]; //mouse in graph coordinates, where 0,0 is the top-left corner of the blue rectangle
