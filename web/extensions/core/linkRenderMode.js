@@ -7,7 +7,7 @@ const ext = {
 		app.ui.settings.addSetting({
 			id,
 			name: "Link Render Mode",
-			defaultValue: 2,
+			defaultValue: 0,
 			type: "combo",
 			options: [...LiteGraph.LINK_RENDER_MODES, "Hidden"].map((m, i) => ({
 				value: i,
