@@ -71,24 +71,21 @@ function graphEqual(a, b, root = true) {
 }
 
 const undoRedo = async (e) => {
+	const updateState = async (source, target) => {
+		const prevState = source.pop();
+		if (prevState) {
+			target.push(activeState);
+			isOurLoad = true;
+			await app.loadGraphData(prevState, false);
+			activeState = prevState;
+		}
+	}
 	if (e.ctrlKey || e.metaKey) {
 		if (e.key === "y") {
-			const prevState = redo.pop();
-			if (prevState) {
-				undo.push(activeState);
-				isOurLoad = true;
-				await app.loadGraphData(prevState);
-				activeState = prevState;
-			}
+			updateState(redo, undo);
 			return true;
 		} else if (e.key === "z") {
-			const prevState = undo.pop();
-			if (prevState) {
-				redo.push(activeState);
-				isOurLoad = true;
-				await app.loadGraphData(prevState);
-				activeState = prevState;
-			}
+			updateState(undo, redo);
 			return true;
 		}
 	}
@@ -109,6 +106,7 @@ const bindInput = (activeEl) => {
 	}
 };
 
+let keyIgnored = false;
 window.addEventListener(
 	"keydown",
 	(e) => {
@@ -118,6 +116,9 @@ window.addEventListener(
 				// Ignore events on inputs, they have their native history
 				return;
 			}
+
+			keyIgnored = e.key === "Control" || e.key === "Shift" || e.key === "Alt" || e.key === "Meta";
+			if (keyIgnored) return;
 
 			// Check if this is a ctrl+z ctrl+y
 			if (await undoRedo(e)) return;
@@ -129,6 +130,13 @@ window.addEventListener(
 	},
 	true
 );
+
+window.addEventListener("keyup", (e) => {
+	if (keyIgnored) {
+		keyIgnored = false;
+		checkState();
+	}
+});
 
 // Handle clicking DOM elements (e.g. widgets)
 window.addEventListener("mouseup", () => {
