@@ -22,3 +22,5 @@ launch.sh
 *.log
 web_custom_versions/
 .DS_Store
+
+node-backup/
