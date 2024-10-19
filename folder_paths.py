@@ -293,7 +293,7 @@ def get_full_path_or_raise(folder_name: str, filename: str) -> str:
 
 #     return sorted(list(output_list)), output_folders, time.perf_counter()
 
-def get_filename_list_(folder_name: str, sort_by_modified: bool = False) -> tuple[list[str], dict[str, float], float]:
+def get_filename_list_(folder_name: str, sort_by_modified: bool = True) -> tuple[list[str], dict[str, float], float]:
     folder_name = map_legacy(folder_name)
     global folder_names_and_paths
     output_list = set()
@@ -353,7 +353,7 @@ def cached_filename_list_(folder_name: str) -> tuple[list[str], dict[str, float]
 
     return out
 
-def get_filename_list(folder_name: str, sort_by_modified: bool = False) -> list[str]:
+def get_filename_list(folder_name: str, sort_by_modified: bool = True) -> list[str]:
     folder_name = map_legacy(folder_name)
     out = cached_filename_list_(folder_name)
     if out is None:
