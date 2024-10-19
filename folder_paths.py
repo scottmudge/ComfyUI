@@ -280,7 +280,20 @@ def get_full_path_or_raise(folder_name: str, filename: str) -> str:
     return full_path
 
 
-def get_filename_list_(folder_name: str) -> tuple[list[str], dict[str, float], float]:
+# def get_filename_list_(folder_name: str) -> tuple[list[str], dict[str, float], float]:
+#     folder_name = map_legacy(folder_name)
+#     global folder_names_and_paths
+#     output_list = set()
+#     folders = folder_names_and_paths[folder_name]
+#     output_folders = {}
+#     for x in folders[0]:
+#         files, folders_all = recursive_search(x, excluded_dir_names=[".git"])
+#         output_list.update(filter_files_extensions(files, folders[1]))
+#         output_folders = {**output_folders, **folders_all}
+
+#     return sorted(list(output_list)), output_folders, time.perf_counter()
+
+def get_filename_list_(folder_name: str, sort_by_modified: bool = False) -> tuple[list[str], dict[str, float], float]:
     folder_name = map_legacy(folder_name)
     global folder_names_and_paths
     output_list = set()
@@ -291,7 +304,28 @@ def get_filename_list_(folder_name: str) -> tuple[list[str], dict[str, float], f
         output_list.update(filter_files_extensions(files, folders[1]))
         output_folders = {**output_folders, **folders_all}
 
-    return sorted(list(output_list)), output_folders, time.perf_counter()
+    if sort_by_modified:
+        # Create a list of tuples (file_path, modified_time)
+        file_list_with_time = []
+        for file_path in output_list:
+            try:
+                # Find the correct base folder for this file
+                full_path = next((os.path.join(folder, file_path) for folder in output_folders.keys() if os.path.exists(os.path.join(folder, file_path))), None)
+                if full_path is None:
+                    logging.warning(f"Warning: Unable to find full path for {file_path}. Skipping this file.")
+                    continue
+                modified_time = os.path.getmtime(full_path)
+                file_list_with_time.append((file_path, modified_time))
+            except OSError:
+                logging.warning(f"Warning: Unable to get modified time for {file_path}. Skipping this file.")
+                continue
+        
+        # Sort the list by modified time (newest first) and extract only the file paths
+        sorted_output_list = [file for file, _ in sorted(file_list_with_time, key=lambda x: x[1], reverse=True)]
+    else:
+        sorted_output_list = sorted(list(output_list))
+
+    return sorted_output_list, output_folders, time.perf_counter()
 
 def cached_filename_list_(folder_name: str) -> tuple[list[str], dict[str, float], float] | None:
     strong_cache = cache_helper.get(folder_name)
@@ -319,11 +353,11 @@ def cached_filename_list_(folder_name: str) -> tuple[list[str], dict[str, float]
 
     return out
 
-def get_filename_list(folder_name: str) -> list[str]:
+def get_filename_list(folder_name: str, sort_by_modified: bool = False) -> list[str]:
     folder_name = map_legacy(folder_name)
     out = cached_filename_list_(folder_name)
     if out is None:
-        out = get_filename_list_(folder_name)
+        out = get_filename_list_(folder_name, sort_by_modified=sort_by_modified)
         global filename_list_cache
         filename_list_cache[folder_name] = out
     cache_helper.set(folder_name, out)
