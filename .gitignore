@@ -24,3 +24,5 @@ web_custom_versions/
 .DS_Store
 
 node-backup/
+
+launc_char.sh
